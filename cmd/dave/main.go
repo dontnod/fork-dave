@@ -1,14 +1,16 @@
 package main
 
 import (
+	"crypto/tls"
 	"errors"
 	"flag"
 	"fmt"
+	syslog "log"
+	"net/http"
+
 	"github.com/micromata/dave/app"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/net/webdav"
-	syslog "log"
-	"net/http"
 )
 
 func main() {
@@ -48,8 +50,26 @@ func main() {
 		Handler: wdHandler,
 	}
 
+	var tls_config *tls.Config
+	if config.TLS != nil {
+		var secure_ciphers []uint16
+		for _, cipher_suite := range tls.CipherSuites() {
+			if !cipher_suite.Insecure {
+				secure_ciphers = append(secure_ciphers, cipher_suite.ID)
+			}
+		}
+		tls_config = &tls.Config{
+			CipherSuites: secure_ciphers,
+			MinVersion:   tls.VersionTLS12,
+		}
+	}
+
 	http.Handle("/", wrapRecovery(app.NewBasicAuthWebdavHandler(a), config))
 	connAddr := fmt.Sprintf("%s:%s", config.Address, config.Port)
+	server := http.Server{
+		Addr:      connAddr,
+		TLSConfig: tls_config,
+	}
 
 	if config.TLS != nil {
 		log.WithFields(log.Fields{
@@ -57,7 +77,7 @@ func main() {
 			"port":     config.Port,
 			"security": "TLS",
 		}).Info("Server is starting and listening")
-		log.Fatal(http.ListenAndServeTLS(connAddr, config.TLS.CertFile, config.TLS.KeyFile, nil))
+		log.Fatal(server.ListenAndServeTLS(config.TLS.CertFile, config.TLS.KeyFile))
 
 	} else {
 		log.WithFields(log.Fields{
@@ -65,7 +85,7 @@ func main() {
 			"port":     config.Port,
 			"security": "none",
 		}).Info("Server is starting and listening")
-		log.Fatal(http.ListenAndServe(connAddr, nil))
+		log.Fatal(server.ListenAndServe())
 	}
 }
 
