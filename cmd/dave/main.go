@@ -50,16 +50,16 @@ func main() {
 		Handler: wdHandler,
 	}
 
-	var tls_config *tls.Config
+	var tlsConfig *tls.Config
 	if config.TLS != nil {
-		var secure_ciphers []uint16
-		for _, cipher_suite := range tls.CipherSuites() {
-			if !cipher_suite.Insecure {
-				secure_ciphers = append(secure_ciphers, cipher_suite.ID)
+		var secureCiphers []uint16
+		for _, cipherSuite := range tls.CipherSuites() {
+			if !cipherSuite.Insecure {
+				secureCiphers = append(secureCiphers, cipherSuite.ID)
 			}
 		}
-		tls_config = &tls.Config{
-			CipherSuites: secure_ciphers,
+		tlsConfig = &tls.Config{
+			CipherSuites: secureCiphers,
 			MinVersion:   tls.VersionTLS12,
 		}
 	}
@@ -68,7 +68,7 @@ func main() {
 	connAddr := fmt.Sprintf("%s:%s", config.Address, config.Port)
 	server := http.Server{
 		Addr:      connAddr,
-		TLSConfig: tls_config,
+		TLSConfig: tlsConfig,
 	}
 
 	if config.TLS != nil {
