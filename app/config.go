@@ -3,11 +3,12 @@ package app
 import (
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
+
 	"github.com/fsnotify/fsnotify"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"os"
-	"path/filepath"
 )
 
 // Config represents the configuration of the server application.
@@ -111,7 +112,7 @@ func setDefaults() {
 
 // AuthenticationNeeded returns whether users are defined and authentication is required
 func (cfg *Config) AuthenticationNeeded() bool {
-	return cfg.Users != nil && len(cfg.Users) != 0
+	return len(cfg.Users) != 0
 }
 
 func (cfg *Config) handleConfigUpdate(e fsnotify.Event) {

@@ -2,11 +2,12 @@ package subcmd
 
 import (
 	"fmt"
-	"github.com/micromata/dave/app"
-	"github.com/spf13/cobra"
-	"golang.org/x/crypto/ssh/terminal"
 	"os"
 	"syscall"
+
+	"github.com/micromata/dave/app"
+	"github.com/spf13/cobra"
+	"golang.org/x/term"
 )
 
 var passwdCmd = &cobra.Command{
@@ -30,7 +31,7 @@ var passwdCmd = &cobra.Command{
 
 func readPassword() []byte {
 	fmt.Print("Enter password: ")
-	pw, err := terminal.ReadPassword(int(syscall.Stdin))
+	pw, err := term.ReadPassword(int(syscall.Stdin))
 	if err != nil {
 		fmt.Printf("An error occurred reading the password: %s\n", err)
 		os.Exit(1)

@@ -2,12 +2,13 @@ package app
 
 import (
 	"context"
-	log "github.com/sirupsen/logrus"
-	"golang.org/x/net/webdav"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
+	"golang.org/x/net/webdav"
 )
 
 // This file is an extension of golang.org/x/net/webdav/file.go.
@@ -32,7 +33,7 @@ func (d Dir) resolveUser(ctx context.Context) string {
 // achieved during the process, the BaseDir is used
 func (d Dir) resolve(ctx context.Context, name string) string {
 	// This implementation is based on Dir.Open's code in the standard net/http package.
-	if filepath.Separator != '/' && strings.IndexRune(name, filepath.Separator) >= 0 ||
+	if filepath.Separator != '/' && strings.ContainsRune(name, filepath.Separator) ||
 		strings.Contains(name, "\x00") {
 		return ""
 	}

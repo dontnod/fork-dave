@@ -3,7 +3,6 @@ package app
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -61,7 +60,7 @@ log:
   error: true
 `)
 
-	err := ioutil.WriteFile(filepath.Join(tmpDir, "config.yaml"), yamlCfg, 0600)
+	err := os.WriteFile(filepath.Join(tmpDir, "config.yaml"), yamlCfg, 0600)
 	if err != nil {
 		t.Errorf("error writing test config. error = %v", err)
 	}
